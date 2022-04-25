@@ -1,70 +1,107 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.port || 3000;
+const bodyParser = require('body-parser');
 
-const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-let database = [];
-let id = 0;
+let mealDatabase = [];
+let mealId = 0;
 
-app.all("*", (req, res, next) => {
+let userDatabase = [];
+let userId = 0;
+
+app.all('*', (req, res, next) => {
   const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
+  console.log(`Methode ${method} aangeroepen`);
   next();
 });
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
   res.status(200).json({
     status: 200,
-    result: "Hello World",
+    result: 'Hello World!',
   });
 });
 
-app.post("/api/movie", (req, res) => {
-  let movie = req.body;
-  id++;
-  movie = {
-    id,
-    ...movie,
+// meal
+app.post('/api/meal', (req, res) => {
+  let meal = req.body;
+  console.log(meal);
+  mealId++;
+  meal = {
+    id: mealId,
+    ...meal,
   };
-  console.log(movie);
-  database.push(movie);
+
+  mealDatabase.push(meal);
+  console.log(mealDatabase);
   res.status(201).json({
     status: 201,
-    result: database,
+    result: meal,
   });
 });
 
-app.get("/api/movie/:movieId", (req, res, next) => {
-  const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
-  let movie = database.filter((item) => item.id == movieId);
-  if (movie.length > 0) {
-    console.log(movie);
+app.get('/api/meal', (req, res) => {
+  res.status(200).json({
+    status: 200,
+    result: mealDatabase,
+  });
+});
+
+app.get('/api/meal/:mealId', (req, res) => {
+  const mealId = req.params.mealId;
+  let meal = mealDatabase.filter((item) => item.id == mealId);
+
+  if (meal.length > 0) {
+    console.log(meal);
     res.status(200).json({
       status: 200,
-      result: movie,
+      result: meal,
     });
   } else {
-    res.status(401).json({
-      status: 401,
-      result: `Movie with ID ${movieId} not found`,
+    res.status(404).json({
+      status: 404,
+      result: `Meal with ID ${mealId} not found`,
     });
   }
 });
 
-app.get("/api/movie", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
+// user
+app.post('/api/user', (req, res) => {
+  let user = req.body;
+  if (userDatabase.filter((item) => item.email == user.email)) {
+    userId++;
+    user = {
+      id: userId,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      street: user.street,
+      city: user.city,
+      emailAdress: user.emailAdress,
+      phoneNumber: user.phoneNumber,
+      password: user.password,
+    }
+    res.status(200).json({
+      status: 200,
+      result: user,
+    });
+  } else {
+    res.status(404).json({
+      status: 404,
+      result: 'Email already in use',
+    });
+  }
 });
 
-app.all("*", (req, res) => {
-  res.status(401).json({
-    status: 401,
-    result: "End-point not found",
+app.delete('/api/user/delete:userId', (req, res) => { 
+  
+});
+
+app.all('*', (req, res) => {
+  res.status(400).json({
+    status: 404,
+    result: 'End-point not found',
   });
 });
 
