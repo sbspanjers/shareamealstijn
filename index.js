@@ -104,12 +104,12 @@ app.get('/api/user', (req, res) => {
   });
 });
 
-// app.get('/api/user:userId', (req, res) => {
-//   res.status(400).json({
-//     status: 404,
-//     result: 'Not implemented yet',
-//   });
-// });
+ app.get('/api/user/profile/:userId', (req, res) => {
+   res.status(400).json({
+     status: 404,
+     result: 'Not implemented yet',
+   });
+ });
 
 app.get('/api/user/:userId', (req, res) => {
   const userId = req.params.userId;
