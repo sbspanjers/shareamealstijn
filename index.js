@@ -111,7 +111,7 @@ app.get('/api/user', (req, res) => {
 //   });
 // });
 
-app.get('/api/user:userId', (req, res) => {
+app.get('/api/user/:userId', (req, res) => {
   const userId = req.params.userId;
   let user = userDatabase.filter((item) => item.id == userId);
 
@@ -129,19 +129,22 @@ app.get('/api/user:userId', (req, res) => {
   }
 });
 
-app.put('/api/user:userId', (req, res) => { 
+app.put('/api/user/:userId', (req, res) => { 
   let user = req.body;
-  user = {
-    id: userId,
-    firstname: user.firstname,
-    lastname: user.lastname,
-    street: user.street,
-    city: user.city,
-    emailAdress: user.emailAdress,
-    phoneNumber: user.phoneNumber,
-    password: user.password,
-  }
-  userDatabase.put(user);
+  let userIndex = userDatabase.findIndex((obj => obj.id == userId));
+  userDatabase[userIndex] = {
+    user: {
+      id: userId,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      street: user.street,
+      city: user.city,
+      emailAdress: user.emailAdress,
+      phoneNumber: user.phoneNumber,
+      password: user.password,
+    },
+  };
+
   console.log(userDatabase);
   res.status(200).json({
     status: 200,
@@ -149,7 +152,7 @@ app.put('/api/user:userId', (req, res) => {
   });
 });
 
-app.delete('/api/user:userId', (req, res) => {
+app.delete('/api/user/:userId', (req, res) => {
   const userId = req.params.userId;
   console.log(userId);
   let userIndex = userDatabase.findIndex((obj => obj.id == userId));
