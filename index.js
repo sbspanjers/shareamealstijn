@@ -118,7 +118,7 @@ app.get('/api/user:userId', (req, res) => {
   if (user.length > 0) {
     console.log(user);
     res.status(200).json({
-      status: 200,
+      status: 201,
       result: user,
     });
   } else {
@@ -150,7 +150,8 @@ app.put('/api/user:userId', (req, res) => {
 });
 
 app.delete('/api/user:userId', (req, res) => {
-  const userId = req.params.id;
+  const userId = req.params.userId;
+  console.log(userId);
   let userIndex = userDatabase.findIndex((obj => obj.id == userId));
 
   if (userIndex > -1) {
