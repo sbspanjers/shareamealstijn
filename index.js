@@ -15,7 +15,7 @@ let userId = 0;
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 200,
-    result: 'Hello World!',
+    result: 'Hellooo World!',
   });
 });
 
