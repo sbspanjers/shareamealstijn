@@ -54,7 +54,7 @@ router.get("/api/meal/:mealId", (req, res) => {
 });
 
 // user methodes
-router.post("/api/user", userController.addUser);
+router.post("/api/user", userController.validateUser, userController.addUser);
 
 router.get("/api/user", userController.getAllUsers);
 
