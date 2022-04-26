@@ -12,17 +12,17 @@ let mealId = 0;
 let userDatabase = [];
 let userId = 0;
 
-app.all('*', (req, res, next) => {
-  const method = req.method;
-  console.log(`Methode ${method} aangeroepen`);
-  next();
-});
-
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 200,
     result: 'Hello World!',
   });
+});
+
+app.all('*', (req, res, next) => {
+  const method = req.method;
+  console.log(`Methode ${method} aangeroepen`);
+  next();
 });
 
 // meal
