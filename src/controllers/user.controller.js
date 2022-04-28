@@ -31,10 +31,12 @@ let controller = {
       next(error);
     }
   },
-
   addUser: (req, res, next) => {
     let user = req.body;
-    if (userDatabase.filter((item) => item.email == user.email)) {
+    const result = userDatabase.filter(
+      (item) => item.emailAdress == user.emailAdress
+    );
+    if (!result.length) {
       userId++;
       user = {
         id: userId,
@@ -46,15 +48,15 @@ let controller = {
         password: user.password,
       };
       userDatabase.push(user);
-      console.log(userDatabase);
       res.status(200).json({
         status: 200,
         result: user,
       });
+      console.log(user);
     } else {
       res.status(404).json({
         status: 404,
-        result: "Email already in use",
+        result: "Email already in use.",
       });
     }
   },
@@ -90,10 +92,12 @@ let controller = {
     }
   },
   updateUserById: (req, res, next) => {
-    let user = req.body;
-    let userIndex = userDatabase.findIndex((obj) => obj.id == userId);
-    userDatabase[userIndex] = {
-      user: {
+    let userId = req.params.userId;
+    let error;
+    const result = userDatabase.findIndex((user) => user.id == userId);
+    if (result > -1) {
+      let user = req.body;
+      userDatabase[result] = {
         id: userId,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -101,14 +105,18 @@ let controller = {
         city: user.city,
         emailAdress: user.emailAdress,
         password: user.password,
-      },
-    };
-
-    console.log(userDatabase);
-    res.status(200).json({
-      status: 200,
-      result: user,
-    });
+      };
+      error = {
+        status: 200,
+        message: userDatabase[result],
+      };
+    } else {
+      error = {
+        status: 404,
+        message: "User with provided id does not exist",
+      };
+    }
+    next(error);
   },
   deleteUserById: (req, res, next) => {
     const userId = req.params.userId;
