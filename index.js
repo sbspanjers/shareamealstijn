@@ -14,6 +14,13 @@ app.all("*", (req, res, next) => {
   next();
 });
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: 200,
+    result: "Hellooo World!",
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/meal", mealRouter);
 
