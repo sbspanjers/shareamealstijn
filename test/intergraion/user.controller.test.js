@@ -110,21 +110,24 @@ describe("Manage users", () => {
     });
     // user added succesfull
     it("When user is added, return an valid responce.", (done) => {
+      const user = {
+        firstName: "test",
+        lastName: "test",
+        street: "test",
+        city: "test",
+        emailAdress: "test@mail.com",
+        password: "test ww",
+      };
+
       chai
         .request(server)
         .post("/api/user")
-        .send({
-          firstName: "test",
-          lastName: "test",
-          street: "test",
-          city: "test",
-          emailAdress: "test@mail.com",
-          password: "test ww",
-        })
+        .send(user)
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
           status.should.equals(200);
+          result.firstName.should.equals(user.firstName);
           done();
         });
     });
