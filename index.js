@@ -3,6 +3,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
+const mealRouter = require("./src/routes/meal.routes");
 
 app.use(bodyParser.json());
 
@@ -12,7 +13,8 @@ app.all("*", (req, res, next) => {
   next();
 });
 
-app.use(userRouter);
+app.use("/api/user", userRouter);
+app.use("/api/meal", mealRouter);
 
 app.all("*", (req, res) => {
   res.status(400).json({
