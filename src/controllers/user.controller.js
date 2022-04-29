@@ -59,6 +59,7 @@ let controller = {
     }
   },
   getAllUsers: (req, res, next) => {
+    console.log("test test");
     let users = [];
     dbconnection.query("SELECT * FROM user", (error, results, fields) => {
       console.log("#results: " + results.length);
