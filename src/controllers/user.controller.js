@@ -1,4 +1,5 @@
 const assert = require("assert");
+const dbconnection = require("../../database/dbconnection");
 
 let userDatabase = [];
 let userId = 0;
@@ -58,9 +59,17 @@ let controller = {
     }
   },
   getAllUsers: (req, res, next) => {
-    res.status(200).json({
-      status: 200,
-      result: userDatabase,
+    let users = [];
+    dbconnection.query("SELECT * FROM user", (error, results, fields) => {
+      console.log("#results: " + results.length);
+
+      results.forEach((user) => {
+        users.push(user);
+      });
+      res.status(200).json({
+        status: 200,
+        result: users,
+      });
     });
   },
   getProfileFromUser: (req, res, next) => {
