@@ -59,7 +59,6 @@ let controller = {
     }
   },
   getAllUsers: (req, res, next) => {
-    console.log("test test");
     let users = [];
     dbconnection.query("SELECT * FROM user", (error, results, fields) => {
       console.log("#results: " + results.length);
@@ -81,49 +80,77 @@ let controller = {
   },
   getUserById: (req, res, next) => {
     const userId = req.params.userId;
-    let user = userDatabase.filter((item) => item.id == userId);
 
-    if (user.length > 0) {
-      console.log(user);
-      res.status(200).json({
-        status: 200,
-        result: user,
-      });
-    } else {
-      const error = {
-        status: 404,
-        result: `User with ID ${userId} not found`,
-      };
-
-      next(error);
-    }
+    dbconnection.query(
+      `SELECT * FROM user WHERE id = ${userId}`,
+      (error, results, fields) => {
+        console.log("#results:" + results.length);
+        let user = results[0];
+        if (results.length > 0) {
+          console.log(user);
+          res.status(200).json({
+            status: 200,
+            result: user,
+          });
+        } else {
+          const error = {
+            status: 404,
+            result: `User with ID ${userId} not found`,
+          };
+          next(error);
+        }
+      }
+    );
   },
   updateUserById: (req, res, next) => {
+    let user = req.body;
     let userId = req.params.userId;
     let error;
-    const result = userDatabase.findIndex((user) => user.id == userId);
-    if (result > -1) {
-      let user = req.body;
-      userDatabase[result] = {
-        id: userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        street: user.street,
-        city: user.city,
-        emailAdress: user.emailAdress,
-        password: user.password,
-      };
-      error = {
-        status: 200,
-        message: userDatabase[result],
-      };
-    } else {
-      error = {
-        status: 404,
-        message: "User with provided id does not exist",
-      };
-    }
-    next(error);
+
+    dbconnection.query(
+      `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
+      (err, results, fields) => {
+        if (err) throw err;
+        console.log(results);
+
+        if (results != null) {
+          error = {
+            status: 200,
+            message: "User successfull changed",
+          };
+        } else {
+          error = {
+            status: 404,
+            message: "User with provided id does not exist",
+          };
+        }
+
+        next(error);
+      }
+    );
+
+    // if (result > -1) {
+    //   let user = req.body;
+    //   userDatabase[result] = {
+    //     id: userId,
+    //     firstName: user.firstName,
+    //     lastName: user.lastName,
+    //     street: user.street,
+    //     city: user.city,
+    //     emailAdress: user.emailAdress,
+    //     password: user.password,
+    //   };
+    //   error = {
+    //     status: 200,
+    //     message: userDatabase[result],
+    //   };
+    // } else {
+    //   error = {
+    //     status: 404,
+    //     message: "User with provided id does not exist",
+    //   };
+    // }
+    // next(error);
   },
   deleteUserById: (req, res, next) => {
     const userId = req.params.userId;
