@@ -11,7 +11,6 @@ describe("Manage users", () => {
   // UC-201
   describe("UC-201 add user /api/user", () => {
     beforeEach((done) => {
-      userDatabase = [];
       done();
     });
 
@@ -94,7 +93,6 @@ describe("Manage users", () => {
         emailAdress: "sb.spanjers@gmail.com",
         password: "goed ww",
       };
-      chai.request(server).post("/api/user").send(newUser).end();
 
       chai
         .request(server)
@@ -108,6 +106,7 @@ describe("Manage users", () => {
           done();
         });
     });
+
     // user added succesfull
     it("When user is added, return an valid responce.", (done) => {
       const user = {
@@ -127,14 +126,20 @@ describe("Manage users", () => {
           res.should.be.an("object");
           let { status, result } = res.body;
           status.should.equals(200);
-          result.firstName.should.equals(user.firstName);
+          result.should.be.a("string").that.equals("User added");
           done();
         });
     });
   });
 
   // UC-202
+  describe("UC-202 Overzicht users /api/user", () => {
+    beforeEach((done) => {
+      done();
+    });
 
+    it("When there are 0 users, show empty JSON", (done) => {});
+  });
   // UC-203
 
   // UC-204
