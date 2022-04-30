@@ -138,7 +138,27 @@ describe("Manage users", () => {
       done();
     });
 
-    it("When there are 0 users, show empty JSON", (done) => {});
+    // IDK of ik telkens heel de database leeg moet gooien ofzo om dit te testen. Maar dit werkt
+    it("When there are 0 users, show empty JSON", (done) => {
+      chai
+        .request(server)
+        .get("/api/user")
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.a("array");
+          done();
+        });
+    });
+
+    // zoeken op niet bestaand ID
+
+    // actief op false????
+
+    // actief op true????
+
+    // zoeken op bestaand ID
   });
   // UC-203
 
