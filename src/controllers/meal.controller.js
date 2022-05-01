@@ -26,7 +26,7 @@ let controller = {
     let error;
 
     dbconnection.query(
-      `INSERT INTO meal (name, description, price) VALUES ('${meal.name}', '${meal.description}', ${meal.price})`,
+      `INSERT INTO meal (name, description, price, maxAmountOfParticipants) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons})`,
       (err, results, fields) => {
         if (results != null) {
           error = {
