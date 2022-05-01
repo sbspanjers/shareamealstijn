@@ -51,9 +51,8 @@ let controller = {
     let error;
 
     dbconnection.query("SELECT * FROM user", (err, results, fields) => {
-      console.log("#results: " + results.length);
-
       if (results != null) {
+        console.log("#results: " + results.length);
         results.forEach((user) => {
           users.push(user);
         });
@@ -82,25 +81,27 @@ let controller = {
   },
   getUserById: (req, res, next) => {
     const userId = req.params.userId;
+    let error;
 
     dbconnection.query(
       `SELECT * FROM user WHERE id = ${userId}`,
-      (error, results, fields) => {
-        console.log("#results:" + results.length);
+      (err, results, fields) => {
         let user = results[0];
-        if (results.length > 0) {
+        if (results != null) {
+          console.log("#results:" + results.length);
           console.log(user);
-          res.status(200).json({
+          error = {
             status: 200,
             result: user,
-          });
+          };
         } else {
-          const error = {
+          error = {
             status: 404,
             result: `User with ID ${userId} not found`,
           };
-          next(error);
+          console.log(err);
         }
+        next(error);
       }
     );
   },
