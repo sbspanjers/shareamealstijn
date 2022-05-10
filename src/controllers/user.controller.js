@@ -33,6 +33,7 @@ let controller = {
           error = {
             status: 200,
             result: "User added",
+            userId: results.insertId,
           };
           console.log(results);
         } else {
@@ -87,7 +88,7 @@ let controller = {
       `SELECT * FROM user WHERE id = ${userId}`,
       (err, results, fields) => {
         let user = results[0];
-        if (results != null) {
+        if (user != null) {
           console.log("#results:" + results.length);
           console.log(user);
           error = {
@@ -114,9 +115,10 @@ let controller = {
       `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
       (err, results, fields) => {
         if (err) throw err;
+        let { changedRows } = results;
         console.log(results);
 
-        if (results != null) {
+        if (changedRows != 0) {
           error = {
             status: 200,
             result: "User successfull changed",
@@ -140,14 +142,17 @@ let controller = {
     dbconnection.query(
       `DELETE FROM user WHERE id = ${userId}`,
       (err, results, fields) => {
-        if (results != null) {
+        console.log(results);
+
+        let { affectedRows } = results;
+        if (affectedRows != 0) {
           error = {
             status: 200,
             result: "User successfull deleted",
           };
         } else {
           error = {
-            status: 405,
+            status: 404,
             result: "User has not been deleted",
           };
           console.log(err);
