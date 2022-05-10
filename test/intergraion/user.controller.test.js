@@ -275,14 +275,14 @@ describe("Manage users", () => {
     it("When the user does exist, return valid responce", (done) => {
       chai
         .request(server)
-        .put("/api/user/41")
+        .put("/api/user/" + newId)
         .send({
-          firstName: "Stijn",
-          lastName: "Spanjers",
-          street: "Jagersberg",
-          city: "Roosendaal",
-          emailAdress: "sb.spanjers@gmail.com",
-          password: "beter ww",
+          firstName: "veranderde naam",
+          lastName: "test",
+          street: "test",
+          city: "test",
+          emailAdress: "test@mail.com",
+          password: "test ww",
         })
         .end((err, res) => {
           res.should.be.an("object");

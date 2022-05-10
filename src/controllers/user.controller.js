@@ -82,85 +82,109 @@ let controller = {
   },
   getUserById: (req, res, next) => {
     const userId = req.params.userId;
+    console.log(userId);
     let error;
-
-    dbconnection.query(
-      `SELECT * FROM user WHERE id = ${userId}`,
-      (err, results, fields) => {
-        let user = results[0];
-        if (user != null) {
-          console.log("#results:" + results.length);
-          console.log(user);
-          error = {
-            status: 200,
-            result: user,
-          };
-        } else {
-          error = {
-            status: 404,
-            result: `User with ID ${userId} not found`,
-          };
-          console.log(err);
+    if (Number.isInteger(parseInt(userId))) {
+      dbconnection.query(
+        `SELECT * FROM user WHERE id = ${userId}`,
+        (err, results, fields) => {
+          let user = results[0];
+          if (user != null) {
+            console.log("#results:" + results.length);
+            console.log(user);
+            error = {
+              status: 200,
+              result: user,
+            };
+          } else {
+            error = {
+              status: 404,
+              result: `User with ID ${userId} not found`,
+            };
+            console.log(err);
+          }
+          next(error);
         }
-        next(error);
-      }
-    );
+      );
+    } else {
+      error = {
+        status: 404,
+        result: "Input was not a number",
+      };
+      next(error);
+    }
   },
   updateUserById: (req, res, next) => {
     let user = req.body;
     let userId = req.params.userId;
     let error;
 
-    dbconnection.query(
-      `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
-      (err, results, fields) => {
-        if (err) throw err;
-        let { changedRows } = results;
-        console.log(results);
+    if (Number.isInteger(parseInt(userId))) {
+      dbconnection.query(
+        `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
+        (err, results, fields) => {
+          if (err) throw err;
+          let { changedRows } = results;
+          console.log(results);
 
-        if (changedRows != 0) {
-          error = {
-            status: 200,
-            result: "User successfull changed",
-          };
-        } else {
-          error = {
-            status: 404,
-            result: "User with provided id does not exist",
-          };
+          if (changedRows != 0) {
+            error = {
+              status: 200,
+              result: "User successfull changed",
+            };
+          } else {
+            error = {
+              status: 404,
+              result: "User with provided id does not exist",
+            };
+          }
+
+          next(error);
         }
-
-        next(error);
-      }
-    );
+      );
+    } else {
+      error = {
+        status: 404,
+        result: "Input was not a number",
+      };
+      next(error);
+    }
   },
   deleteUserById: (req, res, next) => {
     const userId = req.params.userId;
     let error;
     console.log(userId);
 
-    dbconnection.query(
-      `DELETE FROM user WHERE id = ${userId}`,
-      (err, results, fields) => {
-        console.log(results);
+    if (Number.isInteger(parseInt(userId))) {
+      dbconnection.query(
+        `DELETE FROM user WHERE id = ${userId}`,
+        (err, results, fields) => {
+          console.log(results);
 
-        let { affectedRows } = results;
-        if (affectedRows != 0) {
-          error = {
-            status: 200,
-            result: "User successfull deleted",
-          };
-        } else {
-          error = {
-            status: 404,
-            result: "User has not been deleted",
-          };
-          console.log(err);
+          let { affectedRows } = results;
+          if (affectedRows != 0) {
+            error = {
+              status: 200,
+              result: "User successfull deleted",
+            };
+          } else {
+            error = {
+              status: 404,
+              result: "User has not been deleted",
+            };
+            console.log(err);
+          }
+
+          next(error);
         }
-
-        next(error);
-      }
-    );
+      );
+    } else {
+      error = {
+        status: 404,
+        result: "Input was not a number",
+      };
+      next(error);
+    }
   },
 };
 
