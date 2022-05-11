@@ -83,30 +83,6 @@ describe("Manage users", () => {
         });
     });
 
-    // user already exists
-    it("When user already exists, return an valid error.", (done) => {
-      const newUser = {
-        firstName: "Stijn",
-        lastName: "Spanjers",
-        street: "Jagersberg",
-        city: "Roosendaal",
-        emailAdress: "sb.spanjers@gmail.com",
-        password: "goed ww",
-      };
-
-      chai
-        .request(server)
-        .post("/api/user")
-        .send(newUser)
-        .end((err, res) => {
-          res.should.be.an("object");
-          let { status, result } = res.body;
-          status.should.equals(404);
-          result.should.be.a("string").that.equals("Email already in use.");
-          done();
-        });
-    });
-
     // user added succesfull
     it("When user is added, return a valid responce.", (done) => {
       const user = {
@@ -129,6 +105,30 @@ describe("Manage users", () => {
           result.should.be.a("string").that.equals("User added");
           newId = userId;
           console.log(newId);
+          done();
+        });
+    });
+
+    // user already exists
+    it("When user already exists, return an valid error.", (done) => {
+      const newUser = {
+        firstName: "Stijn",
+        lastName: "Spanjers",
+        street: "Jagersberg",
+        city: "Roosendaal",
+        emailAdress: "test@mail.com",
+        password: "goed ww",
+      };
+
+      chai
+        .request(server)
+        .post("/api/user")
+        .send(newUser)
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(404);
+          result.should.be.a("string").that.equals("Email already in use.");
           done();
         });
     });
