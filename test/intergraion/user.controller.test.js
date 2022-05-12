@@ -15,7 +15,7 @@ describe("Manage users", () => {
     });
 
     // missing an input
-    it("When a required input is missing, return an valid error.", (done) => {
+    it("UC-201-1 When a required input is missing, return an valid error.", (done) => {
       chai
         .request(server)
         .post("/api/user")
@@ -38,7 +38,7 @@ describe("Manage users", () => {
     });
 
     // email not a string
-    it("When email-address is not valid, return valid error.", (done) => {
+    it("UC-201-2 When email-address is not valid, return valid error.", (done) => {
       chai
         .request(server)
         .post("/api/user")
@@ -60,7 +60,7 @@ describe("Manage users", () => {
     });
 
     // non valid password
-    it("When password is not valid, return an valid error.", (done) => {
+    it("UC-201-3 When password is not valid, return an valid error.", (done) => {
       chai
         .request(server)
         .post("/api/user")
@@ -84,7 +84,7 @@ describe("Manage users", () => {
     });
 
     // user added succesfull
-    it("When user is added, return a valid responce.", (done) => {
+    it("UC-201-5 When user is added, return a valid responce.", (done) => {
       const user = {
         firstName: "test",
         lastName: "test",
@@ -110,7 +110,7 @@ describe("Manage users", () => {
     });
 
     // user already exists
-    it("When user already exists, return an valid error.", (done) => {
+    it("UC-201-4 When user already exists, return an valid error.", (done) => {
       const newUser = {
         firstName: "Stijn",
         lastName: "Spanjers",
@@ -141,7 +141,7 @@ describe("Manage users", () => {
     });
 
     // IDK of ik telkens heel de database leeg moet gooien ofzo om dit te testen. Maar dit werkt
-    it("When there are 0 users, show empty JSON", (done) => {
+    it("UC-202-1 When there are 0 users, show empty JSON", (done) => {
       chai
         .request(server)
         .get("/api/user")
@@ -181,7 +181,7 @@ describe("Manage users", () => {
     // ongeldig token -> daar werken we nog niet mee
 
     // ongeldige userID
-    it("When the userId is not valid, return a valid error", (done) => {
+    it("UC-204-2 When the userId is not valid, return a valid error", (done) => {
       chai
         .request(server)
         .get("/api/user/999")
@@ -197,7 +197,7 @@ describe("Manage users", () => {
     });
 
     // geldige userID
-    it("When the token is valid, return a valid responce", (done) => {
+    it("UC-204-3 When the token is valid, return a valid responce", (done) => {
       chai
         .request(server)
         .get("/api/user/4")
@@ -218,7 +218,7 @@ describe("Manage users", () => {
     });
 
     // Verplicht veld ontbreekt
-    it("When a field is missing, return valid error", (done) => {
+    it("UC-205-1 When a field is missing, return valid error", (done) => {
       chai
         .request(server)
         .put("/api/user/41")
@@ -245,7 +245,7 @@ describe("Manage users", () => {
     // niet valide email
 
     // gebruiker bestaat niet
-    it("When the user doesn't exist, return valid error", (done) => {
+    it("UC-205-4 When the user doesn't exist, return valid error", (done) => {
       chai
         .request(server)
         .put("/api/user/999")
@@ -271,8 +271,7 @@ describe("Manage users", () => {
     // niet ingelogd
 
     // gebruiker succesvol gewijzigd
-    // als de test 1x is uitgevoerd moet hier een van de attributen verandert worden, anders werkt de test niet juist.
-    it("When the user does exist, return valid responce", (done) => {
+    it("UC-205-6 When the user does exist, return valid responce", (done) => {
       chai
         .request(server)
         .put("/api/user/" + newId)
@@ -301,7 +300,7 @@ describe("Manage users", () => {
     });
 
     // gebruiker bestaat niet
-    it("When user doesn't exists, return valid error", (done) => {
+    it("UC-206-1 When user doesn't exists, return valid error", (done) => {
       chai
         .request(server)
         .delete("/api/user/999")
@@ -319,7 +318,7 @@ describe("Manage users", () => {
     // Actor is geen eigenaar
 
     // Gebruiker succesvol verwijderd
-    it("When user is removed, return valid responce", (done) => {
+    it("UC-206-4 When user is removed, return valid responce", (done) => {
       console.log("newId = " + newId);
       chai
         .request(server)
