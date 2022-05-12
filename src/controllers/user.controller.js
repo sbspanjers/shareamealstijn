@@ -48,10 +48,29 @@ let controller = {
     );
   },
   getAllUsers: (req, res, next) => {
+    const params = req.query;
+    const { firstName, lastName } = params;
+
     let users = [];
     let error;
 
-    dbconnection.query("SELECT * FROM user", (err, results, fields) => {
+    let queryString = "SELECT * FROM user";
+    if (firstName || lastName) {
+      queryString += " WHERE ";
+      if (firstName) {
+        queryString += `firstName = '${firstName}'`;
+      }
+      if (firstName && lastName) {
+        queryString += " AND ";
+      }
+      if (lastName) {
+        queryString += `lastName = '${lastName}'`;
+      }
+    }
+    queryString += ";";
+    console.log(queryString);
+
+    dbconnection.query(queryString, (err, results, fields) => {
       if (results != null) {
         console.log("#results: " + results.length);
         results.forEach((user) => {
@@ -81,8 +100,9 @@ let controller = {
     next(error);
   },
   getUserById: (req, res, next) => {
-    const userId = req.params.userId;
-    console.log(userId);
+    const params = req.params;
+    const { userId } = params;
+    console.log(params);
     let error;
     if (Number.isInteger(parseInt(userId))) {
       dbconnection.query(
@@ -91,7 +111,6 @@ let controller = {
           let user = results[0];
           if (user != null) {
             console.log("#results:" + results.length);
-            console.log(user);
             error = {
               status: 200,
               result: user,
@@ -115,8 +134,10 @@ let controller = {
     }
   },
   updateUserById: (req, res, next) => {
-    let user = req.body;
-    let userId = req.params.userId;
+    const user = req.body;
+    const params = req.params;
+    const { userId } = params;
+    console.log(userId);
     let error;
 
     if (Number.isInteger(parseInt(userId))) {
@@ -124,14 +145,21 @@ let controller = {
         `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
         (err, results, fields) => {
           if (err) throw err;
-          let { changedRows } = results;
+          const { affectedRows, changedRows } = results;
           console.log(results);
 
-          if (changedRows != 0) {
-            error = {
-              status: 200,
-              result: "User successfull changed",
-            };
+          if (affectedRows != 0) {
+            if (changedRows != 0) {
+              error = {
+                status: 200,
+                result: "User successfull changed",
+              };
+            } else {
+              error = {
+                status: 404,
+                result: "User not changed",
+              };
+            }
           } else {
             error = {
               status: 404,
