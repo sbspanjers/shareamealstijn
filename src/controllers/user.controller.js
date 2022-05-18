@@ -1,6 +1,8 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 let controller = {
   validateUser: (req, res, next) => {
@@ -27,6 +29,7 @@ let controller = {
 
     try {
       assert(typeof phoneNumber === "string", "Phonenumber is not valid");
+      next();
     } catch (err) {
       const error = {
         status: 400,
@@ -38,24 +41,27 @@ let controller = {
   addUser: (req, res, next) => {
     let user = req.body;
     let error;
-    const queryString = `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, street, city) VALUES ('${user.firstName}', '${user.lastName}', 1, '${user.emailAdress}', '${user.password}', '${user.street}', '${user.city}')`;
 
-    dbconnection.query(queryString, (err, results, fields) => {
-      if (results != null) {
-        error = {
-          status: 201,
-          result: "User added",
-          userId: results.insertId,
-        };
-        console.log(results);
-      } else {
-        error = {
-          status: 409,
-          message: "Email already in use.",
-        };
-        console.log(err);
-      }
-      next(error);
+    bcrypt.hash(user.password, saltRounds, function (err, hash) {
+      const queryString = `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, street, city) VALUES ('${user.firstName}', '${user.lastName}', 1, '${user.emailAdress}', '${hash}', '${user.street}', '${user.city}')`;
+
+      dbconnection.query(queryString, (err, results, fields) => {
+        if (results != null) {
+          error = {
+            status: 201,
+            result: "User added",
+            userId: results.insertId,
+          };
+          console.log(results);
+        } else {
+          error = {
+            status: 409,
+            message: "Email already in use.",
+          };
+          console.log(err);
+        }
+        next(error);
+      });
     });
   },
   getAllUsers: (req, res, next) => {
@@ -171,11 +177,11 @@ let controller = {
     const token = tokenString[1];
     let error;
 
-    const payload = jwt.decode(token);
-    if (parseInt(userId) == payload.userId) {
-      const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`;
+    bcrypt.hash(user.password, saltRounds, function (err, hash) {
+      const payload = jwt.decode(token);
+      if (parseInt(userId) == payload.userId) {
+        const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${hash}' WHERE id = ${userId}`;
 
-      if (Number.isInteger(parseInt(userId))) {
         dbconnection.query(queryString, (err, results, fields) => {
           if (err) throw err;
           const { affectedRows, changedRows } = results;
@@ -193,6 +199,7 @@ let controller = {
                 message: "User not changed",
               };
             }
+            next(error);
           } else {
             error = {
               status: 400,
@@ -204,18 +211,12 @@ let controller = {
         });
       } else {
         error = {
-          status: 404,
-          message: "Input was not a number",
+          status: 403,
+          message: "You can't change this account, because it is not yours",
         };
         next(error);
       }
-    } else {
-      error = {
-        status: 403,
-        message: "You can't change this account, because it is not yours",
-      };
-      next(error);
-    }
+    });
   },
   deleteUserById: (req, res, next) => {
     const userId = req.params.userId;
