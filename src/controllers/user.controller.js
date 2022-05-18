@@ -1,7 +1,6 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
-
-// Maybe joi from npm
+const jwt = require("jsonwebtoken");
 
 let controller = {
   validateUser: (req, res, next) => {
@@ -25,46 +24,44 @@ let controller = {
   addUser: (req, res, next) => {
     let user = req.body;
     let error;
+    const queryString = `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, street, city) VALUES ('${user.firstName}', '${user.lastName}', 1, '${user.emailAdress}', '${user.password}', '${user.street}', '${user.city}')`;
 
-    dbconnection.query(
-      `INSERT INTO user (firstName, lastName, isActive, emailAdress, password, street, city) VALUES ('${user.firstName}', '${user.lastName}', 1, '${user.emailAdress}', '${user.password}', '${user.street}', '${user.city}')`,
-      (err, results, fields) => {
-        if (results != null) {
-          error = {
-            status: 200,
-            result: "User added",
-            userId: results.insertId,
-          };
-          console.log(results);
-        } else {
-          error = {
-            status: 404,
-            result: "Email already in use.",
-          };
-          console.log(err);
-        }
-        next(error);
+    dbconnection.query(queryString, (err, results, fields) => {
+      if (results != null) {
+        error = {
+          status: 200,
+          result: "User added",
+          userId: results.insertId,
+        };
+        console.log(results);
+      } else {
+        error = {
+          status: 404,
+          result: "Email already in use.",
+        };
+        console.log(err);
       }
-    );
+      next(error);
+    });
   },
   getAllUsers: (req, res, next) => {
     const params = req.query;
-    const { firstName, lastName } = params;
+    const { active, firstName } = params;
 
     let users = [];
     let error;
 
     let queryString = "SELECT * FROM user";
-    if (firstName || lastName) {
+    if (active || firstName) {
       queryString += " WHERE ";
-      if (firstName) {
-        queryString += `firstName = '${firstName}'`;
+      if (active) {
+        queryString += `isActive = ${active}`;
       }
-      if (firstName && lastName) {
+      if (active && firstName) {
         queryString += " AND ";
       }
-      if (lastName) {
-        queryString += `lastName = '${lastName}'`;
+      if (firstName) {
+        queryString += `firstName LIKE '${firstName}%'`;
       }
     }
     queryString += ";";
@@ -93,38 +90,57 @@ let controller = {
     });
   },
   getProfileFromUser: (req, res, next) => {
-    const error = {
-      status: 404,
-      result: "Not implemented yet",
-    };
-    next(error);
+    let error;
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
+
+    if (token) {
+      const payload = jwt.decode(token);
+      const userId = payload.userId;
+      const queryString = `SELECT * FROM user WHERE id = ${userId}`;
+
+      dbconnection.query(queryString, (err, results, fields) => {
+        if (results != null) {
+          const { ...user } = results[0];
+          error = {
+            status: 200,
+            result: user,
+          };
+          console.log(user);
+          next(error);
+        } else {
+          error = {
+            status: 404,
+            result: "User does not exist",
+          };
+          next(error);
+        }
+      });
+    }
   },
   getUserById: (req, res, next) => {
     const params = req.params;
     const { userId } = params;
-    console.log(params);
     let error;
+
+    const queryString = `SELECT * FROM user WHERE id = ${userId};`;
+
     if (Number.isInteger(parseInt(userId))) {
-      dbconnection.query(
-        `SELECT * FROM user WHERE id = ${userId}`,
-        (err, results, fields) => {
-          let user = results[0];
-          if (user != null) {
-            console.log("#results:" + results.length);
-            error = {
-              status: 200,
-              result: user,
-            };
-          } else {
-            error = {
-              status: 404,
-              result: `User with ID ${userId} not found`,
-            };
-            console.log(err);
-          }
-          next(error);
+      dbconnection.query(queryString, (err, results, fields) => {
+        let user = results[0];
+        if (user != null) {
+          error = {
+            status: 200,
+            result: user,
+          };
+        } else {
+          error = {
+            status: 404,
+            result: `User with ID ${userId} not found`,
+          };
         }
-      );
+        next(error);
+      });
     } else {
       error = {
         status: 404,
@@ -140,36 +156,35 @@ let controller = {
     console.log(userId);
     let error;
 
-    if (Number.isInteger(parseInt(userId))) {
-      dbconnection.query(
-        `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`,
-        (err, results, fields) => {
-          if (err) throw err;
-          const { affectedRows, changedRows } = results;
-          console.log(results);
+    const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`;
 
-          if (affectedRows != 0) {
-            if (changedRows != 0) {
-              error = {
-                status: 200,
-                result: "User successfull changed",
-              };
-            } else {
-              error = {
-                status: 404,
-                result: "User not changed",
-              };
-            }
+    if (Number.isInteger(parseInt(userId))) {
+      dbconnection.query(queryString, (err, results, fields) => {
+        if (err) throw err;
+        const { affectedRows, changedRows } = results;
+        console.log(results);
+
+        if (affectedRows != 0) {
+          if (changedRows != 0) {
+            error = {
+              status: 200,
+              result: "User successfull changed",
+            };
           } else {
             error = {
               status: 404,
-              result: "User with provided id does not exist",
+              result: "User not changed",
             };
           }
-
-          next(error);
+        } else {
+          error = {
+            status: 404,
+            result: "User with provided id does not exist",
+          };
         }
-      );
+
+        next(error);
+      });
     } else {
       error = {
         status: 404,
@@ -183,29 +198,28 @@ let controller = {
     let error;
     console.log(userId);
 
+    const queryString = `DELETE FROM user WHERE id = ${userId}`;
+
     if (Number.isInteger(parseInt(userId))) {
-      dbconnection.query(
-        `DELETE FROM user WHERE id = ${userId}`,
-        (err, results, fields) => {
-          console.log(results);
+      dbconnection.query(queryString, (err, results, fields) => {
+        console.log(results);
 
-          let { affectedRows } = results;
-          if (affectedRows != 0) {
-            error = {
-              status: 200,
-              result: "User successfull deleted",
-            };
-          } else {
-            error = {
-              status: 404,
-              result: "User has not been deleted",
-            };
-            console.log(err);
-          }
-
-          next(error);
+        let { affectedRows } = results;
+        if (affectedRows != 0) {
+          error = {
+            status: 200,
+            result: "User successfull deleted",
+          };
+        } else {
+          error = {
+            status: 404,
+            result: "User has not been deleted",
+          };
+          console.log(err);
         }
-      );
+
+        next(error);
+      });
     } else {
       error = {
         status: 404,

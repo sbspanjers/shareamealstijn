@@ -9,4 +9,6 @@ router.get("", mealController.getAllMeals);
 
 router.get("/:mealId", mealController.getMealById);
 
+router.put("/:mealId", mealController.updateMealById);
+
 module.exports = router;

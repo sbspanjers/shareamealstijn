@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const userRouter = require("./src/routes/user.routes");
+const authRouter = require("./src/routes/auth.routes");
 const mealRouter = require("./src/routes/meal.routes");
 const port = process.env.PORT;
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/meal", mealRouter);
 

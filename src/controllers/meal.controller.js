@@ -1,8 +1,6 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
 
-// Maybe joi from npm
-
 let controller = {
   validateMeal: (req, res, next) => {
     let user = req.body;
@@ -26,7 +24,7 @@ let controller = {
     let error;
 
     dbconnection.query(
-      `INSERT INTO meal (name, description, price, maxAmountOfParticipants) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons})`,
+      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${meal.cookId}, '${meal.allergenes}')`,
       (err, results, fields) => {
         if (results != null) {
           error = {
@@ -97,6 +95,51 @@ let controller = {
         next(error);
       }
     );
+  },
+  updateMealById: (req, res, next) => {
+    const meal = req.body;
+    const params = req.params;
+    const { mealId } = params;
+    console.log(mealId);
+
+    let error;
+
+    const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome}, maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${meal.cookId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}' WHERE id = ${mealId}`;
+
+    if (Number.isInteger(parseInt(mealId))) {
+      dbconnection.query(queryString, (err, results, fields) => {
+        if (err) throw err;
+        const { affectedRows, changedRows } = results;
+        console.log(results);
+
+        if (affectedRows != 0) {
+          if (changedRows != 0) {
+            error = {
+              status: 200,
+              result: "Meal successfull changed",
+            };
+          } else {
+            error = {
+              status: 404,
+              result: "Meal not changed",
+            };
+          }
+        } else {
+          error = {
+            status: 404,
+            result: "User with provided id does not exist",
+          };
+        }
+
+        next(error);
+      });
+    } else {
+      error = {
+        status: 404,
+        result: "Input was not a number",
+      };
+      next(error);
+    }
   },
 };
 
