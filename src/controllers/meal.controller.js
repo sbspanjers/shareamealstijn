@@ -1,5 +1,8 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
+const jwt = require("jsonwebtoken");
+
+const checkUserIdQuery = "SELECT cookId FROM meal WHERE id = ?";
 
 let controller = {
   validateMeal: (req, res, next) => {
@@ -29,12 +32,12 @@ let controller = {
         if (results != null) {
           error = {
             status: 200,
-            result: "Meal added",
+            message: "Meal added",
           };
         } else {
           error = {
             status: 404,
-            result: "Meal not added",
+            message: "Meal not added",
           };
           console.log(err);
         }
@@ -60,7 +63,7 @@ let controller = {
       } else {
         error = {
           status: 404,
-          result: "Something went wrong",
+          message: "Something went wrong",
         };
         console.log(err);
       }
@@ -87,7 +90,7 @@ let controller = {
         } else {
           error = {
             status: 404,
-            result: `Meal with ID ${mealId} not found`,
+            message: `Meal with ID ${mealId} not found`,
           };
           console.log(err);
         }
@@ -100,46 +103,85 @@ let controller = {
     const meal = req.body;
     const params = req.params;
     const { mealId } = params;
-    console.log(mealId);
-
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
+    const payload = jwt.decode(token);
     let error;
 
-    const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome}, maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${meal.cookId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}' WHERE id = ${mealId}`;
+    dbconnection.query(checkUserIdQuery, [mealId], (err, results, fields) => {
+      if (payload.userId == results[0].cookId) {
+        const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome}, maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${meal.cookId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}' WHERE id = ${mealId}`;
+        dbconnection.query(queryString, (err, results, fields) => {
+          if (err) throw err;
+          const { affectedRows, changedRows } = results;
+          console.log(results);
 
-    if (Number.isInteger(parseInt(mealId))) {
-      dbconnection.query(queryString, (err, results, fields) => {
-        if (err) throw err;
-        const { affectedRows, changedRows } = results;
-        console.log(results);
+          if (affectedRows != 0) {
+            if (changedRows != 0) {
+              error = {
+                status: 200,
+                message: "Meal successfull changed",
+              };
+            } else {
+              error = {
+                status: 404,
+                message: "Meal not changed",
+              };
+            }
+          } else {
+            error = {
+              status: 404,
+              message: "User with provided id does not exist",
+            };
+          }
 
-        if (affectedRows != 0) {
-          if (changedRows != 0) {
+          next(error);
+        });
+      } else {
+        error = {
+          status: 403,
+          message: "You can't edit this meal, because you are not the owner.",
+        };
+        next(error);
+      }
+    });
+  },
+  deleteMealById: (req, res, next) => {
+    const mealId = req.params.mealId;
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
+    const payload = jwt.decode(token);
+    let error;
+
+    dbconnection.query(checkUserIdQuery, [mealId], (err, results, fields) => {
+      if (payload.userId == results[0].cookId) {
+        const queryString = `DELETE FROM meal WHERE id = ${mealId}`;
+
+        dbconnection.query(queryString, (err, results, fields) => {
+          const { affectedRows } = results;
+          if (affectedRows != 0) {
             error = {
               status: 200,
-              result: "Meal successfull changed",
+              message: "Meal successfull deleted",
             };
           } else {
             error = {
               status: 404,
-              result: "Meal not changed",
+              message: "Meal has not been deleted",
             };
+            console.log(err);
           }
-        } else {
-          error = {
-            status: 404,
-            result: "User with provided id does not exist",
-          };
-        }
 
+          next(error);
+        });
+      } else {
+        error = {
+          status: 403,
+          message: "You can't delete this meal, because you are not the owner.",
+        };
         next(error);
-      });
-    } else {
-      error = {
-        status: 404,
-        result: "Input was not a number",
-      };
-      next(error);
-    }
+      }
+    });
   },
 };
 

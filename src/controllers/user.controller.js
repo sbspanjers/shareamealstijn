@@ -4,19 +4,33 @@ const jwt = require("jsonwebtoken");
 
 let controller = {
   validateUser: (req, res, next) => {
-    let user = req.body;
-    let { firstName, lastName, street, city, emailAdress, password } = user;
+    const user = req.body;
+    const { firstName, lastName, emailAdress, password } = user;
     try {
+      const pattern = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
       assert(typeof firstName === "string", "Firstname must be a string.");
       assert(typeof lastName === "string", "Lastname must be a string.");
 
-      assert(typeof emailAdress === "string", "Email must be a string.");
+      assert(pattern.test(emailAdress), "Emailadress is not valid");
       assert(typeof password === "string", "Password must be a string.");
       next();
     } catch (err) {
       const error = {
         status: 400,
-        result: err.message,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+  validatePhoneNumber: (req, res, next) => {
+    const { phoneNumber } = req.body;
+
+    try {
+      assert(typeof phoneNumber === "string", "Phonenumber is not valid");
+    } catch (err) {
+      const error = {
+        status: 400,
+        message: err.message,
       };
       next(error);
     }
@@ -29,15 +43,15 @@ let controller = {
     dbconnection.query(queryString, (err, results, fields) => {
       if (results != null) {
         error = {
-          status: 200,
+          status: 201,
           result: "User added",
           userId: results.insertId,
         };
         console.log(results);
       } else {
         error = {
-          status: 404,
-          result: "Email already in use.",
+          status: 409,
+          message: "Email already in use.",
         };
         console.log(err);
       }
@@ -81,7 +95,7 @@ let controller = {
       } else {
         error = {
           status: 404,
-          result: "Something went wrong",
+          message: "Something went wrong",
         };
         console.log(err);
       }
@@ -111,7 +125,7 @@ let controller = {
         } else {
           error = {
             status: 404,
-            result: "User does not exist",
+            message: "User does not exist",
           };
           next(error);
         }
@@ -136,7 +150,7 @@ let controller = {
         } else {
           error = {
             status: 404,
-            result: `User with ID ${userId} not found`,
+            message: `User with ID ${userId} not found`,
           };
         }
         next(error);
@@ -144,7 +158,7 @@ let controller = {
     } else {
       error = {
         status: 404,
-        result: "Input was not a number",
+        message: "Input was not a number",
       };
       next(error);
     }
@@ -153,77 +167,97 @@ let controller = {
     const user = req.body;
     const params = req.params;
     const { userId } = params;
-    console.log(userId);
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
     let error;
 
-    const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`;
+    const payload = jwt.decode(token);
+    if (parseInt(userId) == payload.userId) {
+      const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${user.password}' WHERE id = ${userId}`;
 
-    if (Number.isInteger(parseInt(userId))) {
-      dbconnection.query(queryString, (err, results, fields) => {
-        if (err) throw err;
-        const { affectedRows, changedRows } = results;
-        console.log(results);
+      if (Number.isInteger(parseInt(userId))) {
+        dbconnection.query(queryString, (err, results, fields) => {
+          if (err) throw err;
+          const { affectedRows, changedRows } = results;
+          console.log(results);
 
-        if (affectedRows != 0) {
-          if (changedRows != 0) {
-            error = {
-              status: 200,
-              result: "User successfull changed",
-            };
+          if (affectedRows != 0) {
+            if (changedRows != 0) {
+              error = {
+                status: 200,
+                message: "User successfull changed",
+              };
+            } else {
+              error = {
+                status: 401,
+                message: "User not changed",
+              };
+            }
           } else {
             error = {
-              status: 404,
-              result: "User not changed",
+              status: 400,
+              message: "User with provided id does not exist",
             };
           }
-        } else {
-          error = {
-            status: 404,
-            result: "User with provided id does not exist",
-          };
-        }
 
+          next(error);
+        });
+      } else {
+        error = {
+          status: 404,
+          message: "Input was not a number",
+        };
         next(error);
-      });
+      }
     } else {
       error = {
-        status: 404,
-        result: "Input was not a number",
+        status: 403,
+        message: "You can't change this account, because it is not yours",
       };
       next(error);
     }
   },
   deleteUserById: (req, res, next) => {
     const userId = req.params.userId;
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
     let error;
-    console.log(userId);
+    const payload = jwt.decode(token);
 
-    const queryString = `DELETE FROM user WHERE id = ${userId}`;
+    if (parseInt(userId) == payload.userId) {
+      const queryString = `DELETE FROM user WHERE id = ${userId}`;
 
-    if (Number.isInteger(parseInt(userId))) {
-      dbconnection.query(queryString, (err, results, fields) => {
-        console.log(results);
+      if (Number.isInteger(parseInt(userId))) {
+        dbconnection.query(queryString, (err, results, fields) => {
+          console.log(results);
 
-        let { affectedRows } = results;
-        if (affectedRows != 0) {
-          error = {
-            status: 200,
-            result: "User successfull deleted",
-          };
-        } else {
-          error = {
-            status: 404,
-            result: "User has not been deleted",
-          };
-          console.log(err);
-        }
+          const { affectedRows } = results;
+          if (affectedRows != 0) {
+            error = {
+              status: 200,
+              message: "User successfull deleted",
+            };
+          } else {
+            error = {
+              status: 404,
+              message: "User has not been deleted",
+            };
+            console.log(err);
+          }
 
+          next(error);
+        });
+      } else {
+        error = {
+          status: 404,
+          message: "Input was not a number",
+        };
         next(error);
-      });
+      }
     } else {
       error = {
-        status: 404,
-        result: "Input was not a number",
+        status: 403,
+        message: "You can't delete this account, because it is not yours",
       };
       next(error);
     }
