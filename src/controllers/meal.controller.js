@@ -26,8 +26,12 @@ let controller = {
     let meal = req.body;
     let error;
 
+    const tokenString = req.headers.authorization.split(" ");
+    const token = tokenString[1];
+    const payload = jwt.decode(token);
+
     dbconnection.query(
-      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${meal.cookId}, '${meal.allergenes}')`,
+      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
       (err, results, fields) => {
         if (results != null) {
           error = {
