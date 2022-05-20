@@ -54,7 +54,7 @@ let controller = {
       `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
       (err, results, fields) => {
         const { affectedRows } = results;
-        if (affectedRows != 0) {
+        if (affectedRows > 0) {
           error = {
             status: 201,
             message: "Meal added",
