@@ -18,6 +18,7 @@ router.get("/:mealId", mealController.getMealById);
 router.put(
   "/:mealId",
   authController.validateToken,
+  mealController.validateMeal,
   mealController.updateMealById
 );
 

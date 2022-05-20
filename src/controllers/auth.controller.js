@@ -11,13 +11,12 @@ let controller = {
 
     pool.query(queryString, (err, rows, fields) => {
       if (err) {
-        console.log(err.toString());
         res.status(400).json({
           status: 400,
           message: err.toString(),
         });
       }
-      if (rows) {
+      if (rows != 0) {
         //If user does exist
         bcrypt.compare(
           req.body.password,
@@ -45,17 +44,22 @@ let controller = {
             } else {
               res.status(404).json({
                 status: 404,
-                message: "User not found or password invalid",
+                message: "Password invalid",
               });
             }
           }
         );
+      } else {
+        res.status(404).json({
+          status: 404,
+          message: "User not found",
+        });
       }
     });
   },
   validateLogin(req, res, next) {
     // Verify that we receive the expected input
-    const pattern = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
+    const pattern = /[a-z0-9]+@[a-z]+\.[a-z]{2,4}/;
 
     try {
       assert(pattern.test(req.body.emailAdress), "Emailadress is not valid");

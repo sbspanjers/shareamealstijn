@@ -52,13 +52,11 @@ let controller = {
             result: "User added",
             userId: results.insertId,
           };
-          console.log(results);
         } else {
           error = {
             status: 409,
             message: "Email already in use.",
           };
-          console.log(err);
         }
         next(error);
       });
@@ -85,11 +83,9 @@ let controller = {
       }
     }
     queryString += ";";
-    console.log(queryString);
 
     dbconnection.query(queryString, (err, results, fields) => {
       if (results != null) {
-        console.log("#results: " + results.length);
         results.forEach((user) => {
           users.push(user);
         });
@@ -103,7 +99,6 @@ let controller = {
           status: 404,
           message: "Something went wrong",
         };
-        console.log(err);
       }
 
       next(error);
@@ -126,7 +121,6 @@ let controller = {
             status: 200,
             result: user,
           };
-          console.log(user);
           next(error);
         } else {
           error = {
@@ -185,7 +179,6 @@ let controller = {
         dbconnection.query(queryString, (err, results, fields) => {
           if (err) throw err;
           const { affectedRows, changedRows } = results;
-          console.log(results);
 
           if (affectedRows != 0) {
             if (changedRows != 0) {
@@ -230,8 +223,6 @@ let controller = {
 
       if (Number.isInteger(parseInt(userId))) {
         dbconnection.query(queryString, (err, results, fields) => {
-          console.log(results);
-
           const { affectedRows } = results;
           if (affectedRows != 0) {
             error = {
@@ -240,10 +231,9 @@ let controller = {
             };
           } else {
             error = {
-              status: 404,
-              message: "User has not been deleted",
+              status: 400,
+              message: "User doesn't exist",
             };
-            console.log(err);
           }
 
           next(error);
