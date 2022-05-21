@@ -177,7 +177,6 @@ let controller = {
         const queryString = `UPDATE user SET firstName = '${user.firstName}', lastName = '${user.lastName}', street = '${user.street}', city = '${user.city}', emailAdress = '${user.emailAdress}', password = '${hash}' WHERE id = ${userId}`;
 
         dbconnection.query(queryString, (err, results, fields) => {
-          if (err) throw err;
           const { affectedRows, changedRows } = results;
 
           if (affectedRows != 0) {

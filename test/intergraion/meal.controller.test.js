@@ -16,11 +16,16 @@ chai.use(chaiHttp);
 
 describe("Manage meals", () => {
   before(() => {
-    dbconnection.query("DELETE FROM meal");
+    dbconnection.query("DELETE IGNORE FROM meal_participants_user");
+    dbconnection.query("DELETE IGNORE FROM meal");
+    dbconnection.query("DELETE IGNORE FROM user");
   });
 
-  afterEach(() => {
-    dbconnection.query("DELETE FROM meal");
+  afterEach((done) => {
+    dbconnection.query("DELETE IGNORE FROM meal_participants_user");
+    dbconnection.query("DELETE IGNORE FROM meal");
+    dbconnection.query("DELETE IGNORE FROM user");
+    done();
   });
 
   describe("UC-301 Make meal", () => {

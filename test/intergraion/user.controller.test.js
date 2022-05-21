@@ -16,11 +16,16 @@ const user2 = `INSERT INTO user (firstName, lastName, isActive, emailAdress, pas
 
 describe("Manage users", () => {
   before(() => {
-    dbconnection.query("DELETE FROM user");
+    dbconnection.query("DELETE IGNORE FROM meal_participants_user");
+    dbconnection.query("DELETE IGNORE FROM meal");
+    dbconnection.query("DELETE IGNORE FROM user");
   });
 
-  afterEach(() => {
-    dbconnection.query("DELETE FROM user");
+  afterEach((done) => {
+    dbconnection.query("DELETE IGNORE FROM meal_participants_user");
+    dbconnection.query("DELETE IGNORE FROM meal");
+    dbconnection.query("DELETE IGNORE FROM user");
+    done();
   });
 
   // UC-101
@@ -335,7 +340,7 @@ describe("Manage users", () => {
     });
 
     // zoekterm active
-    it("UC-202-4 Search on active, return JSON", (done) => {
+    it("UC-202-5 Search on active, return JSON", (done) => {
       dbconnection.query(user1, () => {
         chai
           .request(server)
@@ -354,7 +359,7 @@ describe("Manage users", () => {
     });
 
     // zoekterm niet bestaande gebruiker
-    it("UC-202-3 existing user to find, return JSON", (done) => {
+    it("UC-202-6 existing user to find, return JSON", (done) => {
       dbconnection.query(user1, () => {
         chai
           .request(server)
@@ -552,8 +557,7 @@ describe("Manage users", () => {
     });
 
     // niet ingelogd
-
-    it("UC-205-4 When the user isn't logged in, return valid error", (done) => {
+    it("UC-205-5 When the user isn't logged in, return valid error", (done) => {
       chai
         .request(server)
         .put("/api/user/99999")
@@ -631,7 +635,7 @@ describe("Manage users", () => {
     });
 
     // niet ingelogd
-    it("UC-206-1 User not logged in, return valid error", (done) => {
+    it("UC-206-2 User not logged in, return valid error", (done) => {
       chai
         .request(server)
         .delete("/api/user/44")
@@ -647,7 +651,7 @@ describe("Manage users", () => {
     });
 
     // Actor is geen eigenaar
-    it("UC-206-1 User not logged in, return valid error", (done) => {
+    it("UC-206-3 User not owner, return valid error", (done) => {
       chai
         .request(server)
         .delete("/api/user/9999")

@@ -30,7 +30,7 @@ let controller = {
       } else {
         error = {
           status: 404,
-          message: "You didn't join the meal.",
+          message: "Meal doesn't exist",
         };
         next(error);
       }

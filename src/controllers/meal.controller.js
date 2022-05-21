@@ -76,7 +76,6 @@ let controller = {
 
     dbconnection.query(`SELECT * FROM meal`, (err, results, fields) => {
       if (results != null) {
-        console.log("#results: " + results.length);
         results.forEach((meal) => {
           meals.push(meal);
         });
@@ -90,7 +89,6 @@ let controller = {
           status: 404,
           message: "Something went wrong",
         };
-        console.log(err);
       }
 
       next(error);
@@ -115,7 +113,6 @@ let controller = {
             status: 404,
             message: `Meal with ID ${mealId} not found`,
           };
-          console.log(err);
         }
 
         next(error);
@@ -185,7 +182,7 @@ let controller = {
 
           dbconnection.query(queryString, (err, results, fields) => {
             const { affectedRows } = results;
-            if (affectedRows != 0) {
+            if (affectedRows > 0) {
               error = {
                 status: 200,
                 message: "Meal successfull deleted",
@@ -195,7 +192,6 @@ let controller = {
                 status: 404,
                 message: "Meal has not been deleted",
               };
-              console.log(err);
             }
 
             next(error);
