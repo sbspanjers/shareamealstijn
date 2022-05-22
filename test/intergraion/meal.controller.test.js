@@ -95,15 +95,16 @@ describe("Manage meals", () => {
           .post("/api/meal")
           .set({ Authorization: `Bearer ${token}` })
           .send({
-            name: "test",
-            description: "test",
+            name: "Salade",
+            description: "Mooie zomerse salade met veel groente",
             price: 3,
-            maxPersons: 2,
+            maxAmountOfParticipants: 2,
             isActive: 1,
             isToTakeHome: 1,
             dateTime: "1000-01-01 00:00:00",
-            imageUrl: "test",
-            allergenes: "test",
+            imageUrl:
+              "https://www.landleven.nl/getmedia/58639eae-3b6a-44db-b9ed-f417bb2859da/gemengde-salade-min.jpg?width=816&height=544&ext=.jpg",
+            allergenes: "lactose",
             isVega: 1,
             isVegan: 0,
           })
@@ -261,15 +262,16 @@ describe("Manage meals", () => {
               Authorization: `Bearer ${token}`,
             })
             .send({
-              name: "test",
-              description: "test",
+              name: "Salade",
+              description: "Mooie zomerse salade met veel groente",
               price: 3,
-              maxPersons: 2,
+              maxAmountOfParticipants: 2,
               isActive: 1,
               isToTakeHome: 1,
               dateTime: "1000-01-01 00:00:00",
-              imageUrl: "test",
-              allergenes: "test",
+              imageUrl:
+                "https://www.landleven.nl/getmedia/58639eae-3b6a-44db-b9ed-f417bb2859da/gemengde-salade-min.jpg?width=816&height=544&ext=.jpg",
+              allergenes: "lactose",
               isVega: 1,
               isVegan: 0,
             })
