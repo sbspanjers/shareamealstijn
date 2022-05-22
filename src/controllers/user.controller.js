@@ -115,7 +115,7 @@ let controller = {
       const queryString = `SELECT * FROM user WHERE id = ${userId}`;
 
       dbconnection.query(queryString, (err, results, fields) => {
-        if (results != null && results > 0) {
+        if (results != null) {
           const { ...user } = results[0];
           error = {
             status: 200,
