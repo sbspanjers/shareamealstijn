@@ -51,7 +51,7 @@ let controller = {
     const payload = jwt.decode(token);
 
     dbconnection.query(
-      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
+      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, dateTime, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons},'${meal.dateTime}' ,${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
       (err, results, fields) => {
         const { affectedRows } = results;
         if (affectedRows > 0) {
@@ -131,7 +131,7 @@ let controller = {
     dbconnection.query(checkUserIdQuery, [mealId], (err, result, fields) => {
       if (result.length > 0) {
         if (payload.userId == result[0].cookId) {
-          const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome}, maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${payload.userId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}' WHERE id = ${mealId}`;
+          const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome}, dateTime = '${meal.dateTime}',maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${payload.userId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}' WHERE id = ${mealId}`;
           dbconnection.query(queryString, (err, results, fields) => {
             const { affectedRows, changedRows } = results;
 
