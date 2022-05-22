@@ -101,7 +101,7 @@ describe("Manage meals", () => {
             maxPersons: 2,
             isActive: 1,
             isToTakeHome: 1,
-            dateTime: "1234-12-12 12:12:12",
+            dateTime: "1234-12-12 12:12:12 AM",
             imageUrl: "test",
             allergenes: "test",
             isVega: 1,
