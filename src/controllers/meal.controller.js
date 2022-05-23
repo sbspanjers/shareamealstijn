@@ -51,7 +51,7 @@ let controller = {
     const payload = jwt.decode(token);
 
     dbconnection.query(
-      `INSERT INTO meal (name, description, price, maxAmountOfParticipants,isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons},${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
+      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}')`,
       (err, results, fields) => {
         if (results != null) {
           const { affectedRows } = results;
@@ -72,6 +72,7 @@ let controller = {
           error = {
             status: 404,
             message: "Meal not added",
+            err: err,
           };
         }
         next(error);
