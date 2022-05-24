@@ -9,7 +9,7 @@ const dbconnection = require("../../database/dbconnection");
 const token =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQ0LCJpYXQiOjE2NTMwNDA1OTgsImV4cCI6MTY1NDA3NzM5OH0.GeNga3pvswkXkTyNrZzuQGyjG8RDXCChcDs1XV25C7c";
 const user1 = `INSERT INTO user (id, firstName, lastName, isActive, emailAdress, password, street, city) VALUES (44, 'test', 'test', 1, 'test.mail@gmail.com', '$2b$10$e3hfgNgG.kSu4NU2S1xjv.Z/DHYmb5p3xszXkVw/tws5qfPkxSqcm', 'test', 'test')`;
-const meal1 = `INSERT INTO meal (id, name, description, price, maxAmountOfParticipants,isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes, dateTime) VALUES (15, 'test', 'test', 5, 5, 1, 0, 0, 1, 'test', 44, 'test', '1000-01-01T00:00:00.000Z')`;
+const meal1 = `INSERT INTO meal (id, name, description, price, maxAmountOfParticipants,isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes, dateTime) VALUES (15, 'test', 'test', 5, 5, 1, 0, 0, 1, 'test', 44, 'gluten', '1000-01-01T00:00:00.000Z')`;
 
 chai.should();
 chai.use(chaiHttp);
@@ -102,7 +102,7 @@ describe("Manage meals", () => {
             isActive: 1,
             isToTakeHome: 1,
             imageUrl: "test",
-            allergenes: "test test",
+            allergenes: "gluten",
             isVega: 0,
             isVegan: 0,
             dateTime: "1000-01-01T00:00:00.000Z",
@@ -269,7 +269,7 @@ describe("Manage meals", () => {
               isActive: 1,
               isToTakeHome: 1,
               imageUrl: "test",
-              allergenes: "test test",
+              allergenes: "gluten",
               isVega: 0,
               isVegan: 0,
               dateTime: "1000-01-01T00:00:00.000Z",
