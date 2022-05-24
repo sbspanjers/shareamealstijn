@@ -53,6 +53,7 @@ let controller = {
     dbconnection.query(
       `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes, dateTime) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}', '${meal.dateTime}')`,
       (err, results, fields) => {
+        console.log(err);
         if (results != null) {
           const { affectedRows } = results;
           if (affectedRows > 0) {
