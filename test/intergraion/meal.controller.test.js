@@ -294,6 +294,13 @@ describe("Manage meals", () => {
       done();
     });
 
+    afterEach((done) => {
+      dbconnection.query("DELETE IGNORE FROM meal_participants_user");
+      dbconnection.query("DELETE IGNORE FROM meal");
+      dbconnection.query("DELETE IGNORE FROM user");
+      done();
+    });
+
     // alle meals
     it("UC-303-1 Get all meals, return valid JSON", (done) => {
       chai
