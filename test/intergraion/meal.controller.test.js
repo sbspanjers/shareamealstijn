@@ -105,7 +105,7 @@ describe("Manage meals", () => {
             allergenes: "test test",
             isVega: 0,
             isVegan: 0,
-            dateTime: "1000-01-01 00:00:00",
+            dateTime: "1000-01-01T00:00:00.000Z",
           })
           .end((err, res) => {
             res.should.be.an("object");
@@ -272,7 +272,7 @@ describe("Manage meals", () => {
               allergenes: "test test",
               isVega: 0,
               isVegan: 0,
-              dateTime: "1000-01-01 00:00:00",
+              dateTime: "1000-01-01T00:00:00.000Z",
             })
             .end((err, res) => {
               res.should.be.an("object");
