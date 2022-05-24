@@ -58,6 +58,7 @@ let controller = {
       `INSERT INTO meal SET ?`,
       meal,
       (err, results, fields) => {
+        console.log(err || results);
         if (results != null) {
           const { affectedRows } = results;
           if (affectedRows > 0) {
