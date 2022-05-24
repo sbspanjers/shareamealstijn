@@ -50,7 +50,7 @@ let controller = {
           error = {
             status: 201,
             result: "User added",
-            userId: results.insertId,
+            user: user,
           };
         } else {
           error = {
@@ -184,6 +184,7 @@ let controller = {
               error = {
                 status: 200,
                 message: "User successfull changed",
+                user: user,
               };
             } else {
               error = {
@@ -226,7 +227,7 @@ let controller = {
           if (affectedRows != 0) {
             error = {
               status: 200,
-              message: "User successfull deleted",
+              message: `User with id ${userId} successfull deleted`,
             };
           } else {
             error = {

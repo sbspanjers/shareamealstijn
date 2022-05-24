@@ -138,7 +138,9 @@ describe("Manage participants", () => {
                 res.should.be.an("object");
                 let { status, message } = res.body;
                 status.should.equals(200);
-                message.should.be.a("string").that.equals("You left the meal.");
+                message.should.be
+                  .a("string")
+                  .that.equals("You left the meal with id 15.");
                 done();
               });
           });

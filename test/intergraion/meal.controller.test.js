@@ -425,7 +425,7 @@ describe("Manage meals", () => {
               status.should.equals(200);
               message.should.be
                 .a("string")
-                .that.equals("Meal successfull deleted");
+                .that.equals("Meal with id 15 successfull deleted");
               done();
             });
         });

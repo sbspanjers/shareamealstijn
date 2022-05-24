@@ -53,7 +53,7 @@ let controller = {
         if (changedRows != 0) {
           error = {
             status: 200,
-            message: "You left the meal.",
+            message: `You left the meal with id ${mealId}.`,
           };
         } else {
           error = {

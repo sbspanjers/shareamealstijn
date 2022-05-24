@@ -199,7 +199,7 @@ let controller = {
             if (affectedRows > 0) {
               error = {
                 status: 200,
-                message: "Meal successfull deleted",
+                message: `Meal with id ${mealId} successfull deleted`,
               };
             } else {
               error = {

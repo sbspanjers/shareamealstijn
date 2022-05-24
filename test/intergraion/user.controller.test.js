@@ -250,10 +250,12 @@ describe("Manage users", () => {
         .send(user)
         .end((err, res) => {
           res.should.be.an("object");
-          let { status, result, userId } = res.body;
+          let { status, result, user } = res.body;
+          const { firstName, lastName } = user;
           status.should.equals(201);
           result.should.be.a("string").that.equals("User added");
-          newId = userId;
+          firstName.should.be.a("string").that.equals("Goede");
+          lastName.should.be.a("string").that.equals("gebruiker");
           done();
         });
     });
@@ -602,11 +604,14 @@ describe("Manage users", () => {
           })
           .end((err, res) => {
             res.should.be.an("object");
-            let { status, message } = res.body;
+            let { status, message, user } = res.body;
+            const { firstName, lastName } = user;
             status.should.equals(200);
             message.should.be
               .a("string")
               .that.equals("User successfull changed");
+            firstName.should.be.a("string").that.equals("veranderde naam");
+            lastName.should.be.a("string").that.equals("test");
             done();
           });
       });
@@ -681,7 +686,7 @@ describe("Manage users", () => {
             status.should.equals(200);
             message.should.be
               .a("string")
-              .that.equals("User successfull deleted");
+              .that.equals("User with id 44 successfull deleted");
             done();
           });
       });
