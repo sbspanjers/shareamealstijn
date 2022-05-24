@@ -48,6 +48,7 @@ let controller = {
 
     dbconnection.query(queryString, (err, results, fields) => {
       const { affectedRows, changedRows } = results;
+      console.log(results);
       if (affectedRows != 0) {
         if (changedRows != 0) {
           error = {
