@@ -11,7 +11,7 @@ let controller = {
       name,
       description,
       price,
-      maxPersons,
+      maxAmountOfParticipants,
       isActive,
       isToTakeHome,
       imageUrl,
@@ -23,7 +23,10 @@ let controller = {
       assert(typeof name === "string", "Name must be a string.");
       assert(typeof description === "string", "Description must be a string.");
       assert(typeof price === "number", "Price must be a integer.");
-      assert(typeof maxPersons === "number", "Max persons must be a integer.");
+      assert(
+        typeof maxAmountOfParticipants === "number",
+        "Max persons must be a integer."
+      );
       assert(typeof isActive === "number", "Active must be a number.");
       assert(
         typeof isToTakeHome === "number",
@@ -39,6 +42,7 @@ let controller = {
         status: 400,
         message: err.message,
       };
+      console.log(err.message);
       next(error);
     }
   },
@@ -49,11 +53,11 @@ let controller = {
     const tokenString = req.headers.authorization.split(" ");
     const token = tokenString[1];
     const payload = jwt.decode(token);
-
+    meal.cookId = payload.userId;
     dbconnection.query(
-      `INSERT INTO meal (name, description, price, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome, imageUrl, cookId, allergenes, dateTime) VALUES ('${meal.name}', '${meal.description}', ${meal.price}, ${meal.maxPersons}, ${meal.isActive}, ${meal.isVega}, ${meal.isVegan}, ${meal.isToTakeHome}, '${meal.imageUrl}', ${payload.userId}, '${meal.allergenes}', '${meal.dateTime}')`,
+      `INSERT INTO meal SET ?`,
+      meal,
       (err, results, fields) => {
-        console.log(err);
         if (results != null) {
           const { affectedRows } = results;
           if (affectedRows > 0) {
@@ -141,7 +145,7 @@ let controller = {
     dbconnection.query(checkUserIdQuery, [mealId], (err, result, fields) => {
       if (result.length > 0 && result != null) {
         if (payload.userId == result[0].cookId) {
-          const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome},maxAmountOfParticipants = ${meal.maxPersons}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${payload.userId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}', dateTime = '${meal.dateTime}' WHERE id = ${mealId}`;
+          const queryString = `UPDATE meal SET isActive = ${meal.isActive}, isVega = ${meal.isVega}, isVegan = ${meal.isVegan}, isToTakeHome = ${meal.isToTakeHome},maxAmountOfParticipants = ${meal.maxAmountOfParticipants}, price = ${meal.price}, imageUrl = '${meal.imageUrl}', cookId = ${payload.userId}, name = '${meal.name}', description = '${meal.description}', allergenes = '${meal.allergenes}', dateTime = '${meal.dateTime}' WHERE id = ${mealId}`;
           dbconnection.query(queryString, (err, results, fields) => {
             const { affectedRows, changedRows } = results;
 
